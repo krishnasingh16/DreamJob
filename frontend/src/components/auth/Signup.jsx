@@ -10,6 +10,7 @@ import { USER_API_END_POINT } from "@/utils/constant";
 import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
 import { setloading } from "@/redux/authSlice";
+import { Loader2 } from "lucide-react";
 
 const Signup = () => {
   const [input, setInput] = useState({
@@ -55,7 +56,7 @@ const Signup = () => {
       });
 
       if (res.data.success) {
-        navigate("/");
+        navigate("/login");
         toast.success(res.data.message || "Account Created Successfully");
       }
     } catch (error) {

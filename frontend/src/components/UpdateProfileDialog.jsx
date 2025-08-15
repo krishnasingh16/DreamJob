@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -22,27 +22,13 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
   const { user } = useSelector(store => store.auth);
   const dispatch = useDispatch()
   const [input, setInput] = useState({
-    fullname: "",
-    email: "",
-    phoneNumber: "",
-    bio: "",
-    skills: "",
-    file: null,
+    fullname:user?.fullname || "",
+    email: user?.email || "",
+    phoneNumber: user?.phoneNumber ||"",
+    bio:user?.profile?.bio || "",
+    skills:user?.profile?.skills?.map(skill =>skill) || "",
+    file:user?.profile?.resume,
   });
-
-  // ✅ When user data arrives, fill the form
-  useEffect(() => {
-    if (user) {
-      setInput({
-        fullname: user.fullname || "",
-        email: user.email || "",
-        phoneNumber: user.phoneNumber || "",
-        bio: user.profile?.bio || "",
-        skills: user.profile?.skills?.join(", ") || "",
-        file: null,
-      });
-    }
-  }, [user, open]);
 
   const ChangeEventHandler = (e)=>{
     setInput({...input,[e.target.name]:e.target.value})
@@ -65,20 +51,23 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
       formData.append("file", input.file);
     }
     try {
+      setLoading(true)
       const res =await axios.post(`${USER_API_END_POINT}/profile/update`,formData,{
+        timeout: 120000 ,
         headers:{
           'Content-Type':'multipart/form-data'
         },
         withCredentials:true
       })
       if(res.data.success){
-        dispatch(setUser(res.data.user));
-        toast.success(res.data.message);
+        dispatch(setUser(res?.data.user));
+        toast.success(res?.data.message);
       }
     } catch (error) {
       console.log(error);
-      toast.error(error.response.data.message)
-      
+      toast.error(error?.response?.data.message)
+    }finally{
+      setLoading(false)
     }
     setOpen(false)
     console.log(input);
@@ -158,7 +147,6 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
                   id="skills"
                   name="skills"
                   value={input.skills}
-
                   onChange={ChangeEventHandler}
                   className="col-span-3"
                 ></Input>
@@ -170,7 +158,6 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
                 <Input
                   id="file"
                   name="file"
-                  value={input.file}
                   onChange={ChangeFileHandler}
                   type="file"
                   accept="application/pdf"
