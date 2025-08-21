@@ -6,7 +6,7 @@ const ConnectTOdb = async ()=>{
        console.log("Connected");
        
     } catch (error) {
-        console.log(error in connecting);
+        console.log("error in connecting");
         
     }
 }
